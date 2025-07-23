@@ -1,24 +1,24 @@
-# ワークフローの名前
-name: Copilot PR Review
+# # ワークフローの名前
+# name: Copilot PR Review
 
-# 実行のきっかけ（トリガー）
-on:
-  # プルリクエストが作成されたり、更新（新しいコミットがpush）された時
-  pull_request:
-    types: [opened, synchronize]
+# # 実行のきっかけ（トリガー）
+# on:
+#   # プルリクエストが作成されたり、更新（新しいコミットがpush）された時
+#   pull_request:
+#     types: [opened, synchronize]
 
-# Actionが必要とする権限を設定
-permissions:
-  pull-requests: write # PRにコメントを書き込むために必要
-  contents: read      # PRのコンテンツを読み取るために必要
+# # Actionが必要とする権限を設定
+# permissions:
+#   pull-requests: write # PRにコメントを書き込むために必要
+#   contents: read      # PRのコンテンツを読み取るために必要
 
-# 実行するジョブを定義
-jobs:
-  review:
-    runs-on: ubuntu-latest # 実行環境
-    steps:
-      # 1. リポジトリのコードをチェックアウト
-      - uses: actions/checkout@v4
+# # 実行するジョブを定義
+# jobs:
+#   review:
+#     runs-on: ubuntu-latest # 実行環境
+#     steps:
+#       # 1. リポジトリのコードをチェックアウト
+#       - uses: actions/checkout@v4
 
-      # 2. GitHub公式のCopilotレビューActionを実行
-      - uses: github/copilot-pr-review-action@v1
+#       # 2. GitHub公式のCopilotレビューActionを実行
+#       - uses: github/copilot-pr-review-action@v1

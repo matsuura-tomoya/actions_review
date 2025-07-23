@@ -1,33 +1,33 @@
-name: 'AI inference'
-# 手動でワークフローをトリガーするための設定
-on: 
-  workflow_dispatch:
-  # ワークフローの入力としてプロンプトを受け取る
-  # これは GitHub Actions の UI から入力できる
-    inputs:
-      prompt:
-        description: 'Prompt for the AI model'
-        required: true
+# name: 'AI inference'
+# # 手動でワークフローをトリガーするための設定
+# on: 
+#   workflow_dispatch:
+#   # ワークフローの入力としてプロンプトを受け取る
+#   # これは GitHub Actions の UI から入力できる
+#     inputs:
+#       prompt:
+#         description: 'Prompt for the AI model'
+#         required: true
  
-jobs:
-  inference:
-    # GitHub Models を読み取るための権限を付与
-    permissions:
-      models: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test Local Action
-        id: inference
-        # actions/ai-inference アクションを使用して AI モデルを呼び出す
-        uses: actions/ai-inference@v1
-        with:
-          # プロンプトには GitHub Actions の入力を指定
-          prompt: "${{ github.event.inputs.prompt }}"
-          # GitHub Models で使用可能な AI モデルを指定
-          # デフォルトは gpt-4o
-          model: "gpt-4o"
+# jobs:
+#   inference:
+#     # GitHub Models を読み取るための権限を付与
+#     permissions:
+#       models: read
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Test Local Action
+#         id: inference
+#         # actions/ai-inference アクションを使用して AI モデルを呼び出す
+#         uses: actions/ai-inference@v1
+#         with:
+#           # プロンプトには GitHub Actions の入力を指定
+#           prompt: "${{ github.event.inputs.prompt }}"
+#           # GitHub Models で使用可能な AI モデルを指定
+#           # デフォルトは gpt-4o
+#           model: "gpt-4o"
  
-      - name: Print Output
-        id: output
-        # AI モデルの出力を表示
-        run: echo "${{ steps.inference.outputs.response }}"
+#       - name: Print Output
+#         id: output
+#         # AI モデルの出力を表示
+#         run: echo "${{ steps.inference.outputs.response }}"
