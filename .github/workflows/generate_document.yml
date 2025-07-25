@@ -1,10 +1,82 @@
- name: "Basic example"
- on:
-   pull_request:
-     paths:
-       - '.github/workflows/*.yml'
- jobs:
-   test:
-     uses: gizumon/github-actions-documenter/.github/workflows/github-actions-documenter.yml@main
-     with:
-       filepath: README.md
+name: "Document Changed Files on PR"
+
+on:
+  pull_request:
+    types: [opened, synchronize] # PR作成時と、PRに新たなpushがあった時に実行
+
+permissions:
+  contents: write # Wikiリポジトリへの書き込みに必要
+
+jobs:
+  update-wiki-from-pr:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. PRのコードをチェックアウト（差分比較のため全履歴を取得）
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Wikiリポジトリを 'wiki' ディレクトリにチェックアウト
+      - name: Checkout wiki repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+
+      # 3. PRで変更されたファイルのみを対象にWikiページを更新
+      - name: Update wiki pages based on PR changes
+        id: update_wiki
+        run: |
+          # PRのベースブランチとヘッドブランチを比較し、変更ファイル一覧を取得
+          # ここでは .py ファイルのみを対象とする
+          FILES_CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '\.py$' || true)
+
+          if [ -z "$FILES_CHANGED" ]; then
+            echo "No Python files changed in this PR."
+            exit 0
+          fi
+
+          echo "--- Processing changed files ---"
+          echo "$FILES_CHANGED"
+          echo "--------------------------------"
+
+          # 変更されたファイルごとにループ
+          for file in $FILES_CHANGED; do
+            # Wikiページ名（例: src/utils.py -> src-utils.md）
+            WIKI_PAGE_NAME=$(echo "$file" | sed 's/\//-/g' | sed 's/\.py$//g')
+            WIKI_FILE_PATH="wiki/${WIKI_PAGE_NAME}.md"
+
+            # [重要] ファイルが削除された場合、対応するWikiページも削除
+            if [ ! -f "$file" ]; then
+              if [ -f "$WIKI_FILE_PATH" ]; then
+                echo "File '$file' deleted, removing wiki page..."
+                rm "$WIKI_FILE_PATH"
+              fi
+              continue
+            fi
+
+            # ファイルが追加・変更された場合、Wikiページを上書き作成
+            echo "File '$file' changed, generating wiki page..."
+            {
+              echo "# \`$file\`";
+              echo '```python';
+              cat "$file";
+              echo '```';
+            } > "$WIKI_FILE_PATH"
+          done
+
+      # 4. Wikiに変更があればコミットしてプッシュ
+      - name: Commit and push changes to wiki
+        run: |
+          cd wiki
+          # 差分がなければ何もしない
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit to the wiki."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "docs: Update wiki from PR #${{ github.event.number }}"
+          git push
