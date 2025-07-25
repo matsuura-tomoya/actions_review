@@ -1,6 +1,3 @@
--- 在庫数を確認するためのシンプルなSQLクエリ
--- GitHub Actionsのテスト用
-
 -- 商品テーブルの定義例
 CREATE TABLE products (
     product_id INT PRIMARY KEY,
