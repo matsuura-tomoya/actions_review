@@ -30,7 +30,7 @@ jobs:
         run: |
           # PRのベースブランチとヘッドブランチを比較し、変更ファイル一覧を取得
           # ここでは .py ファイルのみを対象とする
-          FILES_CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '\.py$' || true)
+          FILES_CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '\.\(py\|sql\)$' || true)
 
           if [ -z "$FILES_CHANGED" ]; then
             echo "No Python files changed in this PR."
