@@ -1,0 +1,10 @@
+ name: "Basic example"
+ on:
+   pull_request:
+     paths:
+       - '.github/workflows/*.yml'
+ jobs:
+   test:
+     uses: gizumon/github-actions-documenter/.github/workflows/github-actions-documenter.yml@main
+     with:
+       filepath: README.md
