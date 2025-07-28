@@ -1,8 +1,6 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -22,7 +20,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: python, sql
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
