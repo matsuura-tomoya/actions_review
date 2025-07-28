@@ -1,0 +1,31 @@
+name: "SQL Static Analysis"  
+  
+on:  
+  pull_request:  
+    types: [opened, synchronize, reopened, ready_for_review]  
+  
+jobs:  
+  analyze-sql:  
+    name: Analyze SQL Files  
+    runs-on: ubuntu-latest  
+      
+    steps:  
+    - name: Checkout repository  
+      uses: actions/checkout@v4  
+        
+    - name: Setup Python  
+      uses: actions/setup-python@v4  
+      with:  
+        python-version: '3.x'  
+          
+    - name: Install SQLFluff  
+      run: pip install sqlfluff  
+        
+    - name: Run SQL Linting  
+      run: |  
+        find . -name "*.sql" -type f | xargs sqlfluff lint --dialect postgres  
+          
+    - name: Run SQL Security Checks  
+      run: |  
+        # SQLインジェクション対策のカスタムチェック  
+        find . -name "*.sql" -type f -exec grep -l "UNION\|SELECT.*FROM.*WHERE" {} \;
