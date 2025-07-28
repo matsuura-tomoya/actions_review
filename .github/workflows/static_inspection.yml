@@ -1,29 +1,29 @@
-name: "CodeQL"
+# name: "CodeQL"
 
-on:
-  pull_request:
-    branches: [ main ]
+# on:
+#   pull_request:
+#     branches: [ main ]
 
-jobs:
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# jobs:
+#   analyze:
+#     name: Analyze
+#     runs-on: ubuntu-latest
+#     permissions:
+#       actions: read
+#       contents: read
+#       security-events: write
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      # CodeQLを初期化し、ビルド後に解析を実行
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python, sql
+#       # CodeQLを初期化し、ビルド後に解析を実行
+#       - name: Initialize CodeQL
+#         uses: github/codeql-action/init@v3
+#         with:
+#           languages: python, sql
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+#       - name: Autobuild
+#         uses: github/codeql-action/autobuild@v3
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+#       - name: Perform CodeQL Analysis
+#         uses: github/codeql-action/analyze@v3
