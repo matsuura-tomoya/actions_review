@@ -38,3 +38,5 @@ WHERE
     u.user_id = 1
 ORDER BY
     o.order_date DESC;
+
+## コメントを追加してファイルに変更を加えいています。このことによってレビューがAIで行われるかテスト。
