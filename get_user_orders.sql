@@ -1,7 +1,3 @@
-/*
- テーブル定義の例
- この部分は実際にDBに存在することを想定しています。
-*/
 CREATE TABLE users (
     user_id INT PRIMARY KEY,
     user_name VARCHAR(100) NOT NULL,
