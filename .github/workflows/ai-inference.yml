@@ -1,50 +1,60 @@
-name: 'Review with AI'
-on: 
-  pull_request:
+# name: 'Review with AI'
+# on: 
+#   pull_request:
   
-jobs:
-  review:
-    permissions:
-      models: read
-      contents: read
-      pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+# jobs:
+#   review:
+#     permissions:
+#       # gh ai を使う場合は models: read が必要
+#       models: read
+#       contents: read
+#       pull-requests: write
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Install latest GitHub CLI
+#         run: |
+#           type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+#           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+#           && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+#           && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+#           && sudo apt update \
+#           && sudo apt install gh -y
  
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v46
+#       - name: Get changed files
+#         id: changed-files
+#         uses: tj-actions/changed-files@v46
 
-      # レビュー結果を一時的に保存するファイルを作成
-      - name: Setup review file
-        if: steps.changed-files.outputs.all_changed_files != ''
-        run: echo "### ✨ AIによるレビュー結果" > review_comment.txt
+#       # レビュー結果を一時的に保存するファイルを作成
+#       - name: Setup review file
+#         if: steps.changed-files.outputs.all_changed_files != ''
+#         run: echo "### ✨ AIによるレビュー結果" > review_comment.txt
 
-      # 変更されたファイルごとにループ処理
-      - name: Review each changed file with AI
-        if: steps.changed-files.outputs.all_changed_files != ''
-        # strategy.matrix を使ってファイルごとにジョブを並列実行
-        strategy:
-          matrix:
-            file: ${{ fromJson(steps.changed-files.outputs.all_changed_files_json) }}
-        run: |
-          echo "レビュー中のファイル: ${{ matrix.file }}"
-          # AIレビューを実行
-          response=$(gh ai -s "あなたはプロフェッショナルなレビュアーです。以下の内容をレビューし、フィードバックを提供してください。" < "${{ matrix.file }}")
-          
-          # ファイルごとのレビュー結果を一時ファイルに追記
-          echo -e "\n\n---\n\n#### 📄 **${{ matrix.file }}** へのフィードバック：\n\n$response" >> review_comment.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       # 変更されたファイルごとにループ処理してレビュー結果をまとめる
+#       - name: Review each changed file and build comment
+#         if: steps.changed-files.outputs.all_changed_files != ''
+#         run: |
+#           # 変更されたファイルを1つずつループ処理
+#           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+#             echo "レビュー中のファイル: $file"
 
-      # 1つのコメントとしてPRに投稿する
-      - name: Comment on PR
-        if: steps.changed-files.outputs.all_changed_files != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file review_comment.txt
+#             # AIにレビューを依頼
+#             response=$(gh ai -s "あなたはプロフェッショナルなレビュアーです。以下の内容をレビューし、フィードバックを提供してください。" < "$file")
+            
+#             # ファイルごとのレビュー結果を一時ファイルに追記
+#             echo -e "\n\n---\n\n#### 📄 **$file** へのフィードバック：\n\n$response" >> review_comment.txt
+#           done
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#       # 1つのコメントとしてPRに投稿する
+#       - name: Comment on PR
+#         if: steps.changed-files.outputs.all_changed_files != ''
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           gh pr comment ${{ github.event.pull_request.number }} --body-file review_comment.txt
