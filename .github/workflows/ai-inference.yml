@@ -5,6 +5,7 @@ on:
 jobs:
   review:
     permissions:
+      # gh ai を使う場合は models: read が必要
       models: read
       contents: read
       pull-requests: write
@@ -24,20 +25,20 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: echo "### ✨ AIによるレビュー結果" > review_comment.txt
 
-      # 変更されたファイルごとにループ処理
-      - name: Review each changed file with AI
+      # 変更されたファイルごとにループ処理してレビュー結果をまとめる
+      - name: Review each changed file and build comment
         if: steps.changed-files.outputs.all_changed_files != ''
-        # strategy.matrix を使ってファイルごとにジョブを並列実行
-        strategy:
-          matrix:
-            file: ${{ fromJson(steps.changed-files.outputs.all_changed_files_json) }}
         run: |
-          echo "レビュー中のファイル: ${{ matrix.file }}"
-          # AIレビューを実行
-          response=$(gh ai -s "あなたはプロフェッショナルなレビュアーです。以下の内容をレビューし、フィードバックを提供してください。" < "${{ matrix.file }}")
-          
-          # ファイルごとのレビュー結果を一時ファイルに追記
-          echo -e "\n\n---\n\n#### 📄 **${{ matrix.file }}** へのフィードバック：\n\n$response" >> review_comment.txt
+          # 変更されたファイルを1つずつループ処理
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "レビュー中のファイル: $file"
+
+            # AIにレビューを依頼
+            response=$(gh ai -s "あなたはプロフェッショナルなレビュアーです。以下の内容をレビューし、フィードバックを提供してください。" < "$file")
+            
+            # ファイルごとのレビュー結果を一時ファイルに追記
+            echo -e "\n\n---\n\n#### 📄 **$file** へのフィードバック：\n\n$response" >> review_comment.txt
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
