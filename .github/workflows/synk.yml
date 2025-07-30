@@ -1,0 +1,41 @@
+name: Snyk Security Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize] # PRの作成時と、新しいコミットがプッシュされた時に実行
+    branches: ["main", "master"] # mainブランチに向けたPRのみを対象とする
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      # Snyk Code (SAST) でインジェクションなどをスキャン
+      - name: Run Snyk Code test
+        run: snyk code test --all-projects --report
+        continue-on-error: true # ここを `false` にすると脆弱性発見時にビルドが失敗します
+
+      # 依存関係の脆弱性もスキャンする場合 (推奨)
+      - name: Run Snyk Open Source test
+        run: snyk test --all-projects --report
+        continue-on-error: true
+
+      - name: Upload Snyk report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-reports
+          path: snyk-report.json
