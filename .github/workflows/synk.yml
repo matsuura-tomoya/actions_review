@@ -1,11 +1,15 @@
-name: Snyk Security Scan
+name: Snyk Scan and Comment on PR
 
 on:
   pull_request:
-    branches: ["main"]
+
+# プルリクエストへのコメント投稿に必要な権限を付与
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  snyk:
+  snyk-comment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,22 +23,35 @@ jobs:
       - name: Install Snyk CLI
         run: npm install -g snyk
 
-      - name: Authenticate Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+      # Snykスキャンを実行し、結果をMarkdown形式のファイルに保存
+      - name: Run Snyk and create report
+        run: |
+          # コメントの本文となるファイルを作成
+          {
+            echo '## :zap: Snyk Scan Results'
+            echo ''
+            echo '### Snyk Code (コード脆弱性スキャン)'
+            echo '```text'
+            # snyk code test を実行し、結果を追記。脆弱性があってもエラーで止めない
+            snyk code test || true
+            echo '```'
+            echo ''
+            echo '### Snyk Open Source (依存関係スキャン)'
+            echo '```text'
+            # snyk test を実行し、結果を追記
+            snyk test || true
+            echo '```'
+          } > snyk-report.md
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Run Snyk Code test
-        run: snyk code test --all-projects --report
-        continue-on-error: true
-
-      - name: Run Snyk Open Source test
-        run: snyk test --all-projects --report
-        continue-on-error: true
-
-      - name: Upload Snyk report
-        if: always()
-        uses: actions/upload-artifact@v4
+      # PRにコメントを投稿または更新するアクション
+      - name: Create or update comment on PR
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          name: snyk-reports
-          path: snyk-report.json
-
-  ## 変更のために適当なコメントを残しています
+          # PRの番号を自動で取得
+          issue-number: ${{ github.event.pull_request.number }}
+          # 先ほど作成したレポートファイルをコメントの本文として指定
+          body-path: ./snyk-report.md
+          # 毎回新しいコメントを作るのではなく、既存のコメントを更新するモード
+          edit-mode: replace
