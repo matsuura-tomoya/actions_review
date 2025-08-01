@@ -1,41 +1,41 @@
-name: "CodeQL Python Analysis"  
+# name: "CodeQL Python Analysis"  
   
-on:  
-  pull_request:  
-    types: [opened, synchronize, reopened, ready_for_review]  
+# on:  
+#   pull_request:  
+#     types: [opened, synchronize, reopened, ready_for_review]  
   
-jobs:  
-  analyze-python:  
-    name: Analyze Python  
-    runs-on: ubuntu-latest  
-    permissions:  
-      security-events: write  
-      contents: read  
+# jobs:  
+#   analyze-python:  
+#     name: Analyze Python  
+#     runs-on: ubuntu-latest  
+#     permissions:  
+#       security-events: write  
+#       contents: read  
   
-    steps:  
-    - name: Checkout repository  
-      uses: actions/checkout@v4  
+#     steps:  
+#     - name: Checkout repository  
+#       uses: actions/checkout@v4  
   
-    - name: Initialize CodeQL  
-      uses: github/codeql-action/init@v3  
-      with:  
-        languages: python  
-        queries: |  
-          security-extended  
-          security-and-quality  
-        config: |  
-          name: "Python SQL Injection Detection"  
-          query-filters:  
-            - include:  
-                kind: problem  
-                tags:  
-                  - security  
-                  - external/cwe/cwe-089  
+#     - name: Initialize CodeQL  
+#       uses: github/codeql-action/init@v3  
+#       with:  
+#         languages: python  
+#         queries: |  
+#           security-extended  
+#           security-and-quality  
+#         config: |  
+#           name: "Python SQL Injection Detection"  
+#           query-filters:  
+#             - include:  
+#                 kind: problem  
+#                 tags:  
+#                   - security  
+#                   - external/cwe/cwe-089  
   
-    - name: Autobuild  
-      uses: github/codeql-action/autobuild@v3  
+#     - name: Autobuild  
+#       uses: github/codeql-action/autobuild@v3  
   
-    - name: Perform CodeQL Analysis  
-      uses: github/codeql-action/analyze@v3  
-      with:  
-        category: "/language:python"
+#     - name: Perform CodeQL Analysis  
+#       uses: github/codeql-action/analyze@v3  
+#       with:  
+#         category: "/language:python"
