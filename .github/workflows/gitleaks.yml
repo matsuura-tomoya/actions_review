@@ -1,7 +1,6 @@
 name: gitleaks
 on:
   pull_request:
-  branches: [ main ]
 jobs:
   scan:
     name: gitleaks

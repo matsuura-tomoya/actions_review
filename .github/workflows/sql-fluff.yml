@@ -4,9 +4,6 @@ name: SQLFluff
 # .sql ファイルの変更を含む Pull Request の Opened もしくは Reopened をトリガーとする
 on:
   pull_request: 
-    types: [opened, reopened] 
-    paths:
-      - '**.sql'
 
 # .sql ファイルを整形(変更)する権限を付与
 permissions: write-all
