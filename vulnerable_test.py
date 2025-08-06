@@ -4,13 +4,14 @@ import flask
 # Flaskアプリケーションのインスタンスを作成（Webフレームワークの文脈を持たせるため）
 app = flask.Flask(__name__)
 
+
 @app.route("/users")
 def get_user():
     """
     ユーザーIDを元にデータベースから情報を取得する（脆弱な例）
     """
     # WebリクエストのパラメータからユーザーIDを取得
-    user_id = flask.request.args.get('id')
+    user_id = flask.request.args.get("id")
 
     # データベース接続
     conn = sqlite3.connect("example.db")
@@ -29,5 +30,6 @@ def get_user():
         return f"Database error: {e}"
     finally:
         conn.close()
+
 
 # Snykはコードをスキャンするだけで、このコードを実行する必要はありません。
