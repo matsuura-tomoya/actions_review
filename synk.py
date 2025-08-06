@@ -1,6 +1,5 @@
 import snowflake.connector
 
-
 def generate_report(region_input: str):
     """
     指定された地域の売上レポートを生成する。
