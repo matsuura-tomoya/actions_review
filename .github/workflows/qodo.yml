@@ -1,24 +1,24 @@
-# ワークフローの名前
-name: Qodo.ai AI Code Review
+# # ワークフローの名前
+# name: Qodo.ai AI Code Review
 
-# ワークフローが実行されるタイミング
-# この場合、mainブランチへのPull Requestが作成または更新された時
-on:
-  pull_request:
-    branches: [ main ]
+# # ワークフローが実行されるタイミング
+# # この場合、mainブランチへのPull Requestが作成または更新された時
+# on:
+#   pull_request:
+#     branches: [ main ]
 
-jobs:
-  # 実行するジョブを定義
-  ai-review:
-    # 実行環境を指定 (Ubuntuの最新版)
-    runs-on: ubuntu-latest
+# jobs:
+#   # 実行するジョブを定義
+#   ai-review:
+#     # 実行環境を指定 (Ubuntuの最新版)
+#     runs-on: ubuntu-latest
     
-    steps:
-      # ステップ1: 処理が開始されたことをログに出力
-      # qodo.aiはGitHub Appとして裏側で自動実行されるため、
-      # ワークフローファイル上では、その存在を示すためのステップを記述します。
-      - name: Triggering Qodo.ai Review
-        run: |
-          echo "A Pull Request has been created."
-          echo "Qodo.ai will automatically start its review process in the background."
-          echo "Please check the Pull Request comments for the AI-generated review."
+#     steps:
+#       # ステップ1: 処理が開始されたことをログに出力
+#       # qodo.aiはGitHub Appとして裏側で自動実行されるため、
+#       # ワークフローファイル上では、その存在を示すためのステップを記述します。
+#       - name: Triggering Qodo.ai Review
+#         run: |
+#           echo "A Pull Request has been created."
+#           echo "Qodo.ai will automatically start its review process in the background."
+#           echo "Please check the Pull Request comments for the AI-generated review."
